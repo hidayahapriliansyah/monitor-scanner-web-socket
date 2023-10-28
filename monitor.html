@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitor</title>
+</head>
+
+<body>
+  <h1>Monitor</h1>
+</body>
+
+<script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+  integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
+<script>
+  const socket = io('/', { path: '/scanning' });
+
+  socket.on('ticket-valid', (data) => {
+    alert(`Data is valid: ${data.data}`);
+    console.log('data =>>>', data);
+    console.log('data.data =>>>', data.data);
+  });
+
+  socket.on('ticket-not-valid', (data) => {
+    alert(`Data is not valid: ${data.data}`);
+  });
+</script>
+
+</html>

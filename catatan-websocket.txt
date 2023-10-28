@@ -1,0 +1,28 @@
+Untuk percobaan web socket semuanya menggunakan auth
+ada 
+1 user berperan sebagai super admin
+super admin mencoba fitur monitor dan scanner
+
+super admin memiliki 2 gate
+1 gate monitor dan scanner
+1 gate lagi sama monitor dan scanner
+
+web socket itu cuma berlanggana satu url endpoint atau enggak?
+type data yang dikirim web socket itu apa?
+
+Catatan belajar socket.io
+
+1. Ketika client menjalankan function io() maka itu otomatis meng-emit event connection yang bisa diterima oleh server.
+2. Kan saya ceritanya udah biasa dengan http, saya nganggep kirain socket io bisa langsung handle emit nya berdasarkan path seperti http. Ternyata enggak (secara tidak langsung enggak). Supaya bisa punya path khusus kita harus bikin lagi Server socket io nya. Nah, jadi bisa lebih dari satu server? awokwok. emang gitu konsepnya. Jadi ketika kita buat server dengan
+
+const io = new Server(server);
+
+maka maka socket itu akan menginisialisasi server socket io di root http server, yang mana jika ada io client yang ingin koneksi, maka koneksi nya juga harus ke root url. const socket = io() di client itu secara default mengatur handshake dengan url root path.
+
+Agar kita bisa buat server io itu khusus ngarah ke path tertentu maka di server pas bikinnya harus 
+const io = new Server(server, { path: '/path-apa-gitu'});
+
+dan nanti di client buat nyambung ke io server itu maka harus connectnya kayak gini
+  const socket = io('http://localhost:3000 (ini pokoknya root server nya)', { path: '/first-page' });
+
+Jadi untuk server: nerima emit pakai socket.on() socket dari io.on('connect') untuk nge emit nya pakai io langsung (io dari instans new Server)
