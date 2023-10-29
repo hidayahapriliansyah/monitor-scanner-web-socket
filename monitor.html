@@ -5,10 +5,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Monitor</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    td {
+      border: solid 1px black;
+    }
+  </style>
 </head>
 
 <body>
   <h1>Monitor</h1>
+  <table>
+    <thead>
+      <tr>
+        <td>From Scanner Mana</td>
+        <td>Value yang dibawa</td>
+      </tr>
+    </thead>
+    <tbody class="tbody-data"></tbody>
+  </table>
 </body>
 
 <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
@@ -17,13 +37,22 @@
   const socket = io('/', { path: '/scanning' });
 
   socket.on('ticket-valid', (data) => {
-    alert(`Data is valid: ${data.data}`);
-    console.log('data =>>>', data);
-    console.log('data.data =>>>', data.data);
+    console.log('data =>>', data);
+    const tbody = document.querySelector('.tbody-data');
+
+    const trElement = document.createElement('tr');
+    const tdScannerNameElement = document.createElement('td');
+    tdScannerNameElement.innerText = data.name;
+    const tdScannerValueElement = document.createElement('td');
+    tdScannerValueElement.innerText = data.value;
+    trElement.appendChild(tdScannerNameElement);
+    trElement.appendChild(tdScannerValueElement);
+
+    tbody.appendChild(trElement);
   });
 
   socket.on('ticket-not-valid', (data) => {
-    alert(`Data is not valid: ${data.data}`);
+    alert(`Data is not valid: Name: ${data.name}, Value: ${data.value}`);
   });
 </script>
 

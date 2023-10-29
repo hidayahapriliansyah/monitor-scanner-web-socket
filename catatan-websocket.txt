@@ -26,3 +26,6 @@ dan nanti di client buat nyambung ke io server itu maka harus connectnya kayak g
   const socket = io('http://localhost:3000 (ini pokoknya root server nya)', { path: '/first-page' });
 
 Jadi untuk server: nerima emit pakai socket.on() socket dari io.on('connect') untuk nge emit nya pakai io langsung (io dari instans new Server)
+
+3. Kalau ada sesuatu yang dimulai dari clietn pakai http request boy. Sempet mikir kirain tiba tiba client bisa ngelakuin emit ke room tertentu. Pakai http request aja, nanti di server kalau ada reqeust http itu baru maen di websocket nya. 
+
