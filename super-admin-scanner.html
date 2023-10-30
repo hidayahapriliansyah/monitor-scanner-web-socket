@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scanner</title>
+</head>
+
+<body>
+  <h1>Super Admin Scanner</h1>
+
+  <div>
+    <div>
+      <label for="scanner-name">Scanner Name</label>
+      <input id="scanner-name" type="text" class="scanner-name">
+    </div>
+    <div>
+      <label for="scanner-value">Scanner Value</label>
+      <input id="scanner-value" type="text" class="scanner-value">
+    </div>
+    <div>
+      <label for="scanner-isvalid">IsValid</label>
+      <input id="scanner-isvalid" type="number" class="isValid">
+    </div>
+  </div>
+  <button class="scan-active">Scanning request activate</button>
+</body>
+
+<script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+  integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
+<script>
+  const socket = io('/', { path: '/scanning' });
+
+  const btnScan = document.querySelector('.scan-active');
+  const scannerName = document.querySelector('input.scanner-name');
+  const scannerValue = document.querySelector('input.scanner-value');
+  const isValidValue = document.querySelector('input.isValid');
+
+  btnScan.addEventListener('click', async () => {
+    const response = await fetch('/scanning', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: scannerName.value,
+        value: scannerValue.value,
+        isValid: isValidValue.value,
+      }),
+    });
+    const resJson = await response.json();
+    console.log(resJson);
+  });
+</script>
+
+</html>
