@@ -28,7 +28,6 @@ ioScanning.use((socket, next) => {
 // bikin array buat nampung gate apa yang terkoneksi
 // ketika on connection kalau id nya gak ada di list maka buat baru
 // ketika on disconnect kalau scanner nya udah gak ada yang konek sama sekali maka hapus dari array
-
 let connectedScannerGate = [];
 // bentuknya [{ id: , countConnectedScanner: number, }]
 
@@ -39,6 +38,9 @@ ioScanning.on('connection', (socket) => {
   const { role } = socket.handshake.auth;
   console.log('socket.handshake.auth =>>', socket.handshake.auth);
   if (role === 'scanner') {
+    // tadinya di sini mau bikin pengecekan apakah monitor atau scanner itu berasal gate biasa atau dari super admin
+    // karena di latihan ini dibikin sama alamat domainnya, jadi cookie gate sama superadmin sama
+    // tapi nanti di real project cookienya gate dan super admin bakal beda kok
     const connectedScannerIndex = connectedScannerGate.findIndex((scannerGate) => scannerGate.id === gateId);
     if (connectedScannerIndex !== -1) {
       const connectedScanner = connectedScannerGate[connectedScannerIndex];
@@ -61,22 +63,6 @@ ioScanning.on('connection', (socket) => {
         .emit('connected-scanner', 1);
     }
   } else if (role === 'monitor') {
-    // const connectedScannerIndex = connectedScannerGate.findIndex((scannerGate) => scannerGate.id === gateId);
-    // console.log("role === 'monitor'");
-    // console.log('connectedScannerGate =>>', connectedScannerGate);
-    // if (connectedScannerIndex !== -1) {
-    //   const connectedScanner = connectedScannerGate[connectedScannerIndex];
-    //   console.log('connectedScannerIndex =>>', connectedScannerIndex);
-    //   console.log('connectedScannerCount =>>', connectedScanner.countConnectedScanner);
-    //   socket
-    //     .to(gateId)
-    //     .emit('connected-scanner', connectedScanner.countConnectedScanner);
-    // } else {
-    //   socket
-    //     .to(gateId)
-    //     .emit('connected-scanner', 0);  
-    // }
-
     socket.on('check-connected-scanner-count', (callback) => {
       let connectedScannerCount = 0;
       const connectedScannerIndex = connectedScannerGate.findIndex((scannerGate) => scannerGate.id === gateId);
@@ -145,6 +131,8 @@ app.post('/scanning', (req, res) => {
   const data = req.body;
 
   if (data.isValid === '1') {
+    // pengecekan gate dari super admin ini dibuat untuk simulasi gate watcher buat latihan aja
+    // yang mana nanti di project nya pakai fetch http request biasa aja.
     const gateFromSuperAdmin = organizerScannerData.superAdmin.find((organizer) => organizer.id === gateId);
     if (gateFromSuperAdmin) {
       console.log('gateFromSuperAdmin =>>', gateFromSuperAdmin);

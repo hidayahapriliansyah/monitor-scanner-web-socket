@@ -20,6 +20,7 @@
 
 <body>
   <h1>Super Admin Monitor</h1>
+  <p>Connected scanner: <strong class="connected-scanner-count">0</strong></p>
 
   <table>
     <thead>
@@ -35,7 +36,7 @@
 <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
   integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
 <script>
-  const socket = io('/', { path: '/scanning' });
+  const socket = io('/', { path: '/scanning', auth: { role: 'monitor' } });
 
   socket.on('ticket-valid', (data) => {
     console.log('data =>>', data);
@@ -54,6 +55,26 @@
 
   socket.on('ticket-not-valid', (data) => {
     alert(`Data is not valid: Name: ${data.name}, Value: ${data.value}`);
+  });
+
+  socket.on('connected-scanner', (connectedScanerCount) => {
+    const connectedScannerElement = document.querySelector('.connected-scanner-count');
+    connectedScannerElement.innerText = connectedScanerCount;
+
+    console.log('connected scanner', connectedScanerCount);
+  });
+
+  socket.emit('check-connected-scanner-count', (response) => {
+    // if (err) {
+    //   console.log('error =>>', err);
+    // } else {
+    //   const connectedScannerElement = document.querySelector('.connected-scanner-count');
+    //   connectedScannerElement.innerText = response.connectedScannerCount;
+    //   console.log(response.connectedScannerCount);
+    // }
+    const connectedScannerElement = document.querySelector('.connected-scanner-count');
+    connectedScannerElement.innerText = response.connectedScannerCount;
+    console.log(response.connectedScannerCount);
   });
 </script>
 
