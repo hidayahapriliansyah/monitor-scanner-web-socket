@@ -25,11 +25,97 @@ ioScanning.use((socket, next) => {
 
 // disini ada join room berdasarkan id dari gate id.
 
+// bikin array buat nampung gate apa yang terkoneksi
+// ketika on connection kalau id nya gak ada di list maka buat baru
+// ketika on disconnect kalau scanner nya udah gak ada yang konek sama sekali maka hapus dari array
+
+let connectedScannerGate = [];
+// bentuknya [{ id: , countConnectedScanner: number, }]
+
 ioScanning.on('connection', (socket) => {
   socket.join(gateId);
 
   console.log('a user connected');
+  const { role } = socket.handshake.auth;
+  console.log('socket.handshake.auth =>>', socket.handshake.auth);
+  if (role === 'scanner') {
+    const connectedScannerIndex = connectedScannerGate.findIndex((scannerGate) => scannerGate.id === gateId);
+    if (connectedScannerIndex !== -1) {
+      const connectedScanner = connectedScannerGate[connectedScannerIndex];
+      const updatedConnectedScanner = {
+        ...connectedScanner,
+        countConnectedScanner: connectedScanner.countConnectedScanner + 1,
+      };
+
+      connectedScannerGate[connectedScannerIndex] = updatedConnectedScanner;
+      socket
+        .to(updatedConnectedScanner.id)
+        .emit('connected-scanner', updatedConnectedScanner.countConnectedScanner);
+    } else {
+      connectedScannerGate = [...connectedScannerGate, {
+        id: gateId,
+        countConnectedScanner: 1,
+      }];
+      socket
+        .to(gateId)
+        .emit('connected-scanner', 1);
+    }
+  } else if (role === 'monitor') {
+    // const connectedScannerIndex = connectedScannerGate.findIndex((scannerGate) => scannerGate.id === gateId);
+    // console.log("role === 'monitor'");
+    // console.log('connectedScannerGate =>>', connectedScannerGate);
+    // if (connectedScannerIndex !== -1) {
+    //   const connectedScanner = connectedScannerGate[connectedScannerIndex];
+    //   console.log('connectedScannerIndex =>>', connectedScannerIndex);
+    //   console.log('connectedScannerCount =>>', connectedScanner.countConnectedScanner);
+    //   socket
+    //     .to(gateId)
+    //     .emit('connected-scanner', connectedScanner.countConnectedScanner);
+    // } else {
+    //   socket
+    //     .to(gateId)
+    //     .emit('connected-scanner', 0);  
+    // }
+
+    socket.on('check-connected-scanner-count', (callback) => {
+      let connectedScannerCount = 0;
+      const connectedScannerIndex = connectedScannerGate.findIndex((scannerGate) => scannerGate.id === gateId);
+      console.log("role === 'monitor'");
+      console.log('connectedScannerGate =>>', connectedScannerGate);
+      if (connectedScannerIndex !== -1) {
+        const connectedScanner = connectedScannerGate[connectedScannerIndex];
+        connectedScannerCount = connectedScanner.countConnectedScanner;
+      }
+      callback({
+        connectedScannerCount,
+      });
+    });
+  }
+
   socket.on('disconnect', () => {
+    if (role === 'scanner') {
+      const connectedScannerIndex = connectedScannerGate.findIndex((scannerGate) => scannerGate.id === gateId);
+      if (connectedScannerIndex !== -1) {
+        const connectedScanner = connectedScannerGate[connectedScannerIndex];
+        console.log('connectedScanner.countConnectedScanner disconnet =>>', connectedScanner.countConnectedScanner);
+        if (connectedScanner.countConnectedScanner !== 1) {
+          const reducedCountConnectedScanner = {
+            ...connectedScanner,
+            countConnectedScanner: connectedScanner.countConnectedScanner - 1,
+          }
+
+          connectedScannerGate[connectedScannerIndex] = reducedCountConnectedScanner;
+          socket
+            .to(reducedCountConnectedScanner.id)
+            .emit('connected-scanner', reducedCountConnectedScanner.countConnectedScanner);
+        } else {
+          connectedScannerGate.splice(connectedScannerIndex, 1);
+            socket
+            .to(gateId)
+            .emit('connected-scanner', 0);
+        }
+      }
+    }
     console.log('user disconnected');
   });
 });

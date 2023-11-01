@@ -28,4 +28,7 @@ dan nanti di client buat nyambung ke io server itu maka harus connectnya kayak g
 Jadi untuk server: nerima emit pakai socket.on() socket dari io.on('connect') untuk nge emit nya pakai io langsung (io dari instans new Server)
 
 3. Kalau ada sesuatu yang dimulai dari clietn pakai http request boy. Sempet mikir kirain tiba tiba client bisa ngelakuin emit ke room tertentu. Pakai http request aja, nanti di server kalau ada reqeust http itu baru maen di websocket nya. 
+4. Mau bikin fitur buat monitor ketika socket= io() connect dari client langsung ngasih fedd back berupa berapa scanner yang terhubung ternyata gak bisa kalau pas connect dari server ngirim emit ke client kayak scanner. Kenapa ya? kita coba si client nge emit manual aja deh.
 
+5. buat masalah nomor 4 kita emit aja di client nya, terus langsung dapatin response nya dari server io nya.
+6. NEMU masalah di documentasi nya huhu.
